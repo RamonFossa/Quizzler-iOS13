@@ -35,6 +35,7 @@ class QuizBrain {
     var questionLabel: UILabel?
     var trueButton: UIButton?
     var falseButton: UIButton?
+    var scoreLabel: UILabel?
     
     var standardBackgroundColor: UIColor?
     
@@ -89,6 +90,7 @@ class QuizBrain {
         self.questionLabel?.textColor = UIColor(red: isRed ? 0.6 : 0, green: isRed ? 0 : 0.6, blue: 0, alpha: 1.0)
         self.trueButton?.isHidden = true
         self.falseButton?.isHidden = true
+        self.scoreLabel?.isHidden = true
     }
     
     func answerFeedback(isRightAnswer: Bool) {
@@ -114,13 +116,19 @@ class QuizBrain {
         self.falseButton?.backgroundColor = UIColor(red: (isRightAnswer ? 0.0 : 0.6), green: (!isRightAnswer ? 0.0 : 0.6), blue: 0.0, alpha: 1.0)
     }
     
-    func answerButtonPressed(_ sender: UIButton) {
+    func answerButtonPressed(_ sender: UIButton, _ onCompletion: (_ score: (rightAnswers: Int, totalQuestions: Int)) -> Void) {
         if !self.canClick { return }
         self.canClick = false
         guard let answerPressed = sender.currentTitle else { return }
         let answerPressedBoolean = answerPressed == "True"
         self.selectedButton = answerPressedBoolean
         self.answeredQuestions += 1
-        self.handleAnswer(isRightAnswer: answerPressedBoolean == rightAnswer)
+        let isRightAnswer = answerPressedBoolean == rightAnswer
+        self.handleAnswer(isRightAnswer: isRightAnswer)
+        onCompletion(self.getScore())
+    }
+    
+    func getScore() -> (rightAnswers: Int, totalQuestions: Int) {
+        return (rightAnswers: self.rightAnswers, totalQuestions: self.quiz.count)
     }
 }
